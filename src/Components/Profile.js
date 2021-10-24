@@ -4,9 +4,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { Avatar } from 'primereact/avatar'
+import { Skeleton } from 'primereact/skeleton'
 import { Badge } from 'primereact/badge'
+import ImageLoader from './ImageLoader'
 
-function Profile({ name, bio, avatar, total, username }) {
+function Profile({ profile, isLoading }) {
+  const { name, bio, avatar, links, username } = profile
   return (
     <section>
       <div className="p-d-flex p-jc-center p-ai-center">
@@ -15,26 +18,36 @@ function Profile({ name, bio, avatar, total, username }) {
           imageAlt={`Profile picture of ${name}`}
           size="xlarge"
           shape="circle"
+          template={<ImageLoader avatar={avatar} username={name} />}
           className="p-overlay-badge"
         >
-          <Badge value={total} severity="info" className="p-mr-2 p-mt-2" />
+          {!isLoading && <Badge value={links.length} severity="info" className="p-mr-2 p-mt-2" />}
         </Avatar>
-        <h1 className="p-m-2">{name}</h1>
-        <h4 className="">({username})</h4>
+        {!isLoading ? <h1 className="p-m-2">{name}</h1> : <Skeleton className="p-m-2" shape="rounded" height="30px" width="200px"/>}
+        {!isLoading ? <h4 className="">{username}</h4> : <Skeleton className="" shape="rounded" width="100px"/>}
       </div>
       <div className="p-d-flex p-jc-center w-50">
-        <p>{bio}</p>
+        {!isLoading ? <p>{bio}</p> : <Skeleton className="p-mt-4" width="300px" shape="rounded"/> }
       </div>
     </section>
   )
 }
 
 Profile.propTypes = {
-  name: PropTypes.string.isRequired,
-  bio: PropTypes.string.isRequired,
-  avatar: PropTypes.string.isRequired,
-  total: PropTypes.number.isRequired,
-  username: PropTypes.string.isRequired,
+  profile: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    bio: PropTypes.string.isRequired,
+    avatar: PropTypes.string.isRequired,
+    username: PropTypes.string.isRequired,
+    links: PropTypes.arrayOf(
+      PropTypes.shape({
+        icon: PropTypes.string,
+        name: PropTypes.string,
+        url: PropTypes.string,
+      }),
+    ),
+  }),
+  isLoading: PropTypes.bool.isRequired,
 }
 
 export default Profile
